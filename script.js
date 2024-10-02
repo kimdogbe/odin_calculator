@@ -16,7 +16,9 @@ function divide(a, b) {
 
 let num1 = 0;
 let num2 = 0;
-let operator = '';
+let operator = "";
+
+let displayValue = "";
 
 function operate(operator, num1, num2){
   switch (operator){
