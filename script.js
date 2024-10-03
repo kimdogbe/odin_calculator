@@ -1,3 +1,8 @@
+let currentResult = "0";
+let nextNumber = "";
+let operator = "";
+let displayValue = "0";
+
 function add(a, b) {
 	return Number(a) + Number(b);
 };
@@ -14,13 +19,6 @@ function divide(a, b) {
   return Number(a) / Number(b);
 }
 
-let num1 = "";
-let num2 = "";
-let operator = "";
-let numberToggle = 1;
-
-let displayValue = "";
-
 function operate(operator, prefix, posfix){
   switch (operator){
     case "+":
@@ -35,11 +33,10 @@ function operate(operator, prefix, posfix){
 }
 
 function resetValues() {
-  num1 = "";
-  num2 = "";
+  currentResult = "0";
+  nextNumber = "";
   operator = "";
-  displayValue = 0;
-  numberToggle = 1;
+  displayValue = "0";
 }
 
 function clearDisplay() {
@@ -47,27 +44,11 @@ function clearDisplay() {
   updateDisplay("0");
 }
 
-function setNumber(num){
-  if (numberToggle){
-    num1 = num1 + num;
-    return num1;
-  } 
-  else {
-    num2 = num2 + num;
-    return num2;
-  }
-}
-
-function setOperator(op) {
-  operator = op;
-  numberToggle = 0;
-}
-
 function updateDisplay(value) {
   display.textContent = value;
 }
 
-// html and eventListeners
+// html and eventListeners and General Logic
 const display = document.querySelector("#display");
 
 addEventListener("click", (event) => {
@@ -75,28 +56,42 @@ addEventListener("click", (event) => {
   let buttonClasses = event.target.className;
   
   if (buttonClasses.includes("number btn")){
-    displayValue = setNumber(buttonClicked);
-    updateDisplay(displayValue);
-  }
-  else if (buttonClasses.includes("operand")){
-    if (num1 && num2) {
-      let result = operate(buttonClicked, num1, num2);
-      num1 = result;
-      num2 = "";
-      updateDisplay(result);
+    if (operator == ""){
+      currentResult += buttonClicked;
+      currentResult = Number(currentResult);
+      updateDisplay(currentResult);
     }
     else {
-      setOperator(buttonClicked);
+      nextNumber += buttonClicked;
+      nextNumber = Number(nextNumber);
+      updateDisplay(nextNumber);
+    }
+  }
+  else if (buttonClasses.includes("operand")){
+    if (nextNumber == ""){
+      operator = buttonClicked;
+    }
+    else {
+      currentResult = operate(operator, currentResult, nextNumber);
+      operator = buttonClicked;
+      nextNumber = "";
+    }
+    updateDisplay(currentResult);
+  }
+  else if (buttonClasses.includes("eqlBtn")) {
+    if (operator != ""){
+      if (nextNumber == ""){
+        currentResult = operate(operator, currentResult, 0);
+      }
+      else {
+        currentResult = operate(operator, currentResult, nextNumber);
+      }
+      updateDisplay(currentResult);
     }
   }
   else if (buttonClasses.includes("clear")){
     clearDisplay();
   }
-  else if (buttonClasses.includes("eqlBtn")) {
-    displayValue = operate(operator, num1, num2);
-    updateDisplay(displayValue);
-    resetValues();
-  }
 
-  console.log(`Num1:${num1} Num2:${num2} Op:${operator}`)
+  console.log(`Num1:${currentResult} Num2:${nextNumber} Op:${operator}`)
 });
