@@ -17,46 +17,54 @@ function divide(a, b) {
 let num1 = "";
 let num2 = "";
 let operator = "";
+let numberToggle = 1;
 
 let displayValue = "";
 
-function operate(operator, num1, num2){
+function operate(operator, prefix, posfix){
   switch (operator){
     case "+":
-      return add(num1, num2);
+      return add(prefix, posfix);
     case "-":
-      return subtract(num1, num2);
+      return subtract(prefix, posfix);
     case "x":
-      return multiply(num1, num2);
+      return multiply(prefix, posfix);
     case "/":
-      return divide(num1, num2);
+      return divide(prefix, posfix);
   }
 }
 
-function clearDisplay() {
+function resetValues() {
   num1 = "";
   num2 = "";
   operator = "";
   displayValue = 0;
-  display.textContent = "0";
+  numberToggle = 1;
+}
+
+function clearDisplay() {
+  resetValues();
+  updateDisplay("0");
 }
 
 function setNumber(num){
-  if (operator == ""){
+  if (numberToggle){
     num1 = num1 + num;
     return num1;
   } 
   else {
     num2 = num2 + num;
-    return num2
+    return num2;
   }
 }
 
 function setOperator(op) {
-  if (operator == ""){
-    operator = op;
-    return operator;
-  }
+  operator = op;
+  numberToggle = 0;
+}
+
+function updateDisplay(value) {
+  display.textContent = value;
 }
 
 // html and eventListeners
@@ -65,27 +73,30 @@ const display = document.querySelector("#display");
 addEventListener("click", (event) => {
   let buttonClicked = event.target.innerHTML;
   let buttonClasses = event.target.className;
-
   
-    if (buttonClasses.includes("number")){
+  if (buttonClasses.includes("number btn")){
+    displayValue = setNumber(buttonClicked);
+    updateDisplay(displayValue);
+  }
+  else if (buttonClasses.includes("operand")){
+    if (num1 && num2) {
+      let result = operate(buttonClicked, num1, num2);
+      num1 = result;
+      num2 = "";
+      updateDisplay(result);
+    }
+    else {
+      setOperator(buttonClicked);
+    }
+  }
+  else if (buttonClasses.includes("clear")){
+    clearDisplay();
+  }
+  else if (buttonClasses.includes("eqlBtn")) {
+    displayValue = operate(operator, num1, num2);
+    updateDisplay(displayValue);
+    resetValues();
+  }
 
-      displayValue = setNumber(buttonClicked);
-      display.textContent = displayValue;
-    }
-    else if (buttonClasses.includes("operand")){
-      displayValue = setOperator(buttonClicked);
-      display.textContent = displayValue;
-    }
-    else if (buttonClasses.includes("clear")){
-      clearDisplay();
-    }
-    else if (buttonClasses.includes("eqlBtn")) {
-      displayValue = operate(operator, num1, num2);
-      display.textContent = displayValue;
-    }
-  
-  // if (event.target.className.includes("btn")){
-  //   displayValue = event.target.innerHTML;
-  //   display.textContent = displayValue;
-  // }
+  console.log(`Num1:${num1} Num2:${num2} Op:${operator}`)
 });
